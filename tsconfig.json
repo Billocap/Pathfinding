@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "lib": ["DOM", "ES2015"],
+        "module": "ES2020",
+        "baseUrl": "./src",
+        "sourceMap": false,
+        "declaration": false,
+        "target": "ES5"
+    },
+    
+    "include": [
+        "src"
+    ]
+}
