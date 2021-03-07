@@ -1,5 +1,5 @@
-import { GraphNode } from './Graph';
-import HeapQueue from './HeapQueue';
+import { GraphNode } from '../DS/Graph';
+import HeapQueue from '../DS/HeapQueue';
 
 function astar(start: GraphNode, goal: GraphNode, h: (a: GraphNode, b: GraphNode) => number) {
     const path = new Map<GraphNode, GraphNode>();
@@ -15,7 +15,7 @@ function astar(start: GraphNode, goal: GraphNode, h: (a: GraphNode, b: GraphNode
         if (current == goal) break;
 
         current.neighbors.forEach(([next, weight]) => {
-            if (next != null){
+            if (next){
                 const new_cost = cost.get(current) + weight;
 
                 if (!cost.has(next) || new_cost < cost.get(next)) {

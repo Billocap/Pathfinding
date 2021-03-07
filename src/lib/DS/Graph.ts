@@ -17,7 +17,7 @@ class GraphNode {
     get neighbors(): [GraphNode, weight][] {
         const nodes = this.links;
         
-        let result = [
+        /*let result = [
             nodes.get("right")  || [null, 0],
             nodes.get("left")   || [null, 0],
             nodes.get("tleft")  || [null, 0],
@@ -26,6 +26,17 @@ class GraphNode {
             nodes.get("bleft")  || [null, 0],
             nodes.get("top")    || [null, 0],
             nodes.get("bottom") || [null, 0]
+        ];*/
+
+        let result = [
+            nodes.get("top")    || [null, 0],
+            nodes.get("tright") || [null, 0],
+            nodes.get("right")  || [null, 0],
+            nodes.get("bright") || [null, 0],
+            nodes.get("bottom") || [null, 0],
+            nodes.get("left")   || [null, 0],
+            nodes.get("bleft")  || [null, 0],
+            nodes.get("tleft")  || [null, 0]
         ];
         
         if ((this.x + this.y) % 2 == 0) {
@@ -36,7 +47,7 @@ class GraphNode {
     }
 
     neighbor(direction: direction): [GraphNode, weight] {
-        return this.links.get(direction) || null;
+        return this.links.get(direction) || [null, 0];
     }
 
     link(node: GraphNode, direction: direction, weight: number) {

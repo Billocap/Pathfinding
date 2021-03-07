@@ -1,5 +1,5 @@
-import { GraphNode } from "./Graph";
-import HeapQueue from "./HeapQueue";
+import { GraphNode } from "../DS/Graph";
+import HeapQueue from "../DS/HeapQueue";
 
 function dijkstra(start: GraphNode, goal: GraphNode) {
     const frontier = new HeapQueue<GraphNode>();
@@ -13,7 +13,7 @@ function dijkstra(start: GraphNode, goal: GraphNode) {
     while(frontier.length) {
         const current = frontier.dequeue();
 
-        if (current == goal) break;
+        //if (current == goal) break;
 
         current.neighbors.forEach(([next, weight]) => {
             if (next != null) {

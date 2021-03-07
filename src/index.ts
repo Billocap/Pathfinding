@@ -1,14 +1,43 @@
-import Graph, { GraphNode } from './lib/Graph';
-import floodfill from './lib/floodfill';
-import astar from './lib/astar';
-import dijkstra from './lib/dijkstra';
-import bfs from './lib/bfs';
-import gbfs from './lib/gbfs';
+import dijkstra from './lib/pathfinding/dijkstra';
+import { GraphNode } from './lib/DS/Graph';
+import Tilemap from './lib/DS/Tilemap';
+import { Tile, Tileset } from './lib/DS/Tileset';
+
+import astar from './lib/pathfinding/astar';
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 
-const graph = new Graph();
+const dirt = new Tile<number>(10);
+const grass = new Tile<number>(20);
+const bush = new Tile<number>(30);
+
+const set = new Tileset();
+set.insert(dirt, 0);
+set.insert(grass, 1);
+set.insert(bush, 2);
+
+const map = new Tilemap(set, 15, 15);
+
+map.map = [
+     0,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+     0,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+     0,  0, -1,  0,  0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+     0,  0, -1,  1,  1,  1,  1,  2,  2,  2,  2,  2, -1,  0,  0,
+     0,  0, -1,  1,  1,  1,  2,  2,  2,  2,  2,  1, -1,  0,  0,
+     0,  0, -1,  1,  1,  1,  2,  2,  2,  2,  1,  1, -1,  0,  0,
+     0,  0,  0,  1,  1,  1,  2,  2,  2,  2,  1,  1, -1,  0,  0,
+     0,  0,  0,  1,  1,  2,  2,  2,  2,  1,  1,  1,  1,  0,  0,
+     0,  0, -1,  1,  1,  2,  2,  2,  2,  1,  1,  1,  1,  0,  0,
+     0,  0, -1,  1,  2,  2,  2,  2,  1,  1,  1,  1, -1,  0,  0,
+     0,  0, -1,  2,  2,  2,  2,  2,  1,  1,  1,  1, -1,  0,  0,
+     0,  0, -1,  2,  2,  2,  2,  2,  1,  1,  1,  1, -1,  0,  0,
+    -1, -1, -1,  0,  0, -1, -1, -1, -1,  0,  0, -1, -1,  0,  0,
+     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  0,  0,
+     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  0,  0,
+];
+
+const graph = map.grid();
 
 const tile = 20;
 const size = 15;
@@ -18,22 +47,15 @@ canvas.setAttribute("height", `${tile * size}`);
 
 for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
-        if (
-            !((x >=0 && x<=12) && y==2) && !(x==12 && (y >=2 && y<=6)) && 
-            !((x >=2 && x<=12) && y==12) && !(x==2 && (y >=7 && y<=12))) {
-            graph.add(x, y);
+        if (map.tile(x, y) == 2) {
+            ctx.strokeStyle = "crimson";
+        } else if (map.tile(x, y) == 1) {
+            ctx.strokeStyle = "green";
+        } else {
+            ctx.strokeStyle = "brown";
+        }
 
-            if ((x>=2 && x<=12) && (y>=2 && y<=12)) {
-                graph.link(graph.node(x, y), graph.node(x-1, y), tile + 5);
-                graph.link(graph.node(x, y), graph.node(x, y-1), tile + 5);
-            } else {
-                graph.link(graph.node(x, y), graph.node(x-1, y), tile);
-                graph.link(graph.node(x, y), graph.node(x, y-1), tile);
-            }
-
-            //graph.link(graph.node(x, y), graph.node(x-1, y-1), tile + (4 * tile / 10));
-            //graph.link(graph.node(x, y), graph.node(x+1, y-1), tile + (4 * tile / 10));
-
+        if (map.tile(x, y) != -1) {
             ctx.strokeRect(x * tile + 2, y * tile + 2, tile - 4, tile - 4);
         }
     }
@@ -68,15 +90,73 @@ function drawpath(path: Map<GraphNode, GraphNode>, current: GraphNode) {
 }
 
 function manhattam(goal: GraphNode, next: GraphNode) {
-    return Math.abs((goal.x - next.x) * tile) + Math.abs((goal.y - next.y) * tile);
+    return (Math.abs(goal.x - next.x) + Math.abs(goal.y - next.y)) * tile;
+}
+
+function euclidean(goal: GraphNode, next: GraphNode) {
+    const a = goal.x - next.y;
+    const b = goal.y - next.y;
+
+    return Math.round(Math.sqrt(a * a + b * b));
+}
+
+function weighted_manhattam(goal: GraphNode, next: GraphNode) {
+    const x_dif = goal.x - next.x;
+    const y_dif = goal.y - next.y;
+
+    let x_dis = 0;
+    let y_dis = 0;
+
+    for (let x = 0; x < Math.abs(x_dif); x++) {
+        if (x_dif > 0) {
+            const node = graph.node(next.x + x, next.y);
+
+            if (node && node.neighbor("right")[0]) {
+                x_dis += node.neighbor("right")[1];
+            } else {
+                x_dis += 10;
+            }
+        } else {
+            const node = graph.node(next.x - x, next.y);
+
+            if (node && node.neighbor("left")[0]) {
+                x_dis += node.neighbor("left")[1];
+            } else {
+                x_dis += 10;
+            }
+        }
+    }
+
+    for (let y = 0; y < Math.abs(y_dif); y++) {
+        if (y_dif > 0) {
+            const node = graph.node(next.x, next.y + y);
+
+            if (node && node.neighbor("bottom")[0]) {
+                y_dis += node.neighbor("bottom")[1];
+            } else {
+                y_dis += 10;
+            }
+        } else {
+            const node = graph.node(next.x, next.y - y);
+
+            if (node && node.neighbor("top")[0]) {
+                y_dis += node.neighbor("top")[1];
+            } else {
+                y_dis += 10;
+            }
+        }
+    }
+
+    return x_dis + y_dis;
 }
 
 canvas.addEventListener("mousemove", e => {
     ctx.putImageData(clean, 0, 0);
 
-    const goal = graph.node(Math.floor((e.offsetX - 8)/tile), Math.floor((e.offsetY-8)/tile));
+    const goal = graph.node(Math.floor((e.offsetX-8)/tile), Math.floor((e.offsetY-8)/tile));
 
     let path = astar(start, goal, manhattam);
+    //let path = dijkstra(start, goal);
 
     let current = goal;
 

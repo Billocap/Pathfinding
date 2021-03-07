@@ -1,5 +1,5 @@
-import { GraphNode } from "./Graph";
-import HeapQueue from "./HeapQueue";
+import { GraphNode } from "../DS/Graph";
+import HeapQueue from "../DS/HeapQueue";
 
 function gbfs(start: GraphNode, goal: GraphNode, h: (a: GraphNode, b: GraphNode) => number) {
     const frontier = new HeapQueue<GraphNode>();

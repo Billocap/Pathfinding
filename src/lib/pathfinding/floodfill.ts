@@ -1,4 +1,4 @@
-import { GraphNode } from "./Graph";
+import { GraphNode } from "../DS/Graph";
 
 function floodfill(start: GraphNode) {
     const frontier: GraphNode[] = [start];

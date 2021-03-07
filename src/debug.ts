@@ -1,4 +1,4 @@
-import Graph from './lib/Graph';
+import Graph from './lib/DS/Graph';
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");

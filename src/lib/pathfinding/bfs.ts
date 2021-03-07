@@ -1,4 +1,4 @@
-import { GraphNode } from "./Graph";
+import { GraphNode } from "../DS/Graph";
 
 function bfs(start: GraphNode, goal: GraphNode) {
     const frontier: GraphNode[] = [start];
