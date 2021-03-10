@@ -1,45 +1,47 @@
-import dijkstra from './lib/pathfinding/dijkstra';
 import { GraphNode } from './lib/DS/Graph';
 import Tilemap from './lib/DS/Tilemap';
 import { Tile, Tileset } from './lib/DS/Tileset';
 
 import astar from './lib/pathfinding/astar';
+import dijkstra from './lib/pathfinding/dijkstra';
+import gbfs from './lib/pathfinding/gbfs';
+import bfs from './lib/pathfinding/bfs';
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 
-const dirt = new Tile<number>(10);
-const grass = new Tile<number>(20);
-const bush = new Tile<number>(30);
+const dirt = new Tile([10, 14]);
+const grass = new Tile([20, 28]);
+const bush = new Tile([30, 42]);
 
 const set = new Tileset();
-set.insert(dirt, 0);
-set.insert(grass, 1);
-set.insert(bush, 2);
+set.insert(dirt);
+set.insert(grass);
+set.insert(bush);
 
 const map = new Tilemap(set, 15, 15);
 
 map.map = [
      0,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
      0,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-     0,  0, -1,  0,  0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+     0,  0, -1, -1, -1, -1, -1,  0,  0, -1, -1, -1, -1, -1, -1,
      0,  0, -1,  1,  1,  1,  1,  2,  2,  2,  2,  2, -1,  0,  0,
      0,  0, -1,  1,  1,  1,  2,  2,  2,  2,  2,  1, -1,  0,  0,
      0,  0, -1,  1,  1,  1,  2,  2,  2,  2,  1,  1, -1,  0,  0,
      0,  0,  0,  1,  1,  1,  2,  2,  2,  2,  1,  1, -1,  0,  0,
-     0,  0,  0,  1,  1,  2,  2,  2,  2,  1,  1,  1,  1,  0,  0,
-     0,  0, -1,  1,  1,  2,  2,  2,  2,  1,  1,  1,  1,  0,  0,
+     0,  0,  0,  1,  1,  2,  2,  2,  2,  1,  1,  1,  0,  0,  0,
+     0,  0, -1,  1,  1,  2,  2,  2,  2,  1,  1,  1,  0,  0,  0,
      0,  0, -1,  1,  2,  2,  2,  2,  1,  1,  1,  1, -1,  0,  0,
      0,  0, -1,  2,  2,  2,  2,  2,  1,  1,  1,  1, -1,  0,  0,
      0,  0, -1,  2,  2,  2,  2,  2,  1,  1,  1,  1, -1,  0,  0,
-    -1, -1, -1,  0,  0, -1, -1, -1, -1,  0,  0, -1, -1,  0,  0,
+    -1, -1, -1, -1,  0,  0, -1, -1, -1,  0,  0, -1, -1,  0,  0,
      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  0,  0,
      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  0,  0,
 ];
 
-const graph = map.grid();
+const graph = map.grid(true, true, true, [10, 14]);
 
-const tile = 20;
+const tile = 30;
 const size = 15;
 
 canvas.setAttribute("width",  `${tile * size}`);
@@ -94,60 +96,10 @@ function manhattam(goal: GraphNode, next: GraphNode) {
 }
 
 function euclidean(goal: GraphNode, next: GraphNode) {
-    const a = goal.x - next.y;
+    const a = goal.x - next.x;
     const b = goal.y - next.y;
 
-    return Math.round(Math.sqrt(a * a + b * b));
-}
-
-function weighted_manhattam(goal: GraphNode, next: GraphNode) {
-    const x_dif = goal.x - next.x;
-    const y_dif = goal.y - next.y;
-
-    let x_dis = 0;
-    let y_dis = 0;
-
-    for (let x = 0; x < Math.abs(x_dif); x++) {
-        if (x_dif > 0) {
-            const node = graph.node(next.x + x, next.y);
-
-            if (node && node.neighbor("right")[0]) {
-                x_dis += node.neighbor("right")[1];
-            } else {
-                x_dis += 10;
-            }
-        } else {
-            const node = graph.node(next.x - x, next.y);
-
-            if (node && node.neighbor("left")[0]) {
-                x_dis += node.neighbor("left")[1];
-            } else {
-                x_dis += 10;
-            }
-        }
-    }
-
-    for (let y = 0; y < Math.abs(y_dif); y++) {
-        if (y_dif > 0) {
-            const node = graph.node(next.x, next.y + y);
-
-            if (node && node.neighbor("bottom")[0]) {
-                y_dis += node.neighbor("bottom")[1];
-            } else {
-                y_dis += 10;
-            }
-        } else {
-            const node = graph.node(next.x, next.y - y);
-
-            if (node && node.neighbor("top")[0]) {
-                y_dis += node.neighbor("top")[1];
-            } else {
-                y_dis += 10;
-            }
-        }
-    }
-
-    return x_dis + y_dis;
+    return Math.round(Math.sqrt(a * a + b * b) * tile);
 }
 
 canvas.addEventListener("mousemove", e => {
@@ -155,15 +107,44 @@ canvas.addEventListener("mousemove", e => {
 
     const goal = graph.node(Math.floor((e.offsetX-8)/tile), Math.floor((e.offsetY-8)/tile));
 
-    let path = astar(start, goal, manhattam);
-    //let path = dijkstra(start, goal);
+    let patha = astar(start, goal, manhattam);
+    let pathb = dijkstra(start, goal);
+    let pathc = gbfs(start, goal, manhattam);
+    let pathd = bfs(start, goal);
 
     let current = goal;
 
     while(current) {
-        ctx.fillStyle = "crimson";
+        ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
         ctx.fillRect(current.x * tile, current.y * tile, tile, tile);
 
-        current = path.get(current);
+        current = patha.get(current);
+    }
+
+    current = goal;
+
+    while(current) {
+        ctx.fillStyle = "rgba(0, 255, 0, 0.5)";
+        ctx.fillRect(current.x * tile, current.y * tile, tile, tile);
+
+        current = pathb.get(current);
+    }
+
+    current = goal;
+
+    while(current) {
+        ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
+        ctx.fillRect(current.x * tile, current.y * tile, tile, tile);
+
+        current = pathc.get(current);
+    }
+
+    current = goal;
+
+    while(current) {
+        ctx.fillStyle = "rgba(128, 0, 255, 0.5)";
+        ctx.fillRect(current.x * tile, current.y * tile, tile, tile);
+
+        current = pathd.get(current);
     }
 });

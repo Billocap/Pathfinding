@@ -15,13 +15,13 @@ class Tile<Type> {
 }
 
 class Tileset {
-    private tiles: Tile<number>[];
+    private tiles: Tile<number[]>[];
 
     constructor() {
         this.tiles = [];
     }
 
-    insert(tile: Tile<number>, index: number) {
+    insert(tile: Tile<number[]>, index: number = this.tiles.length) {
         this.tiles.splice(index, 0, tile);
     }
 
@@ -29,11 +29,11 @@ class Tileset {
         this.tiles.splice(index, 1);
     }
 
-    replace(tile: Tile<number>, index: number) {
+    replace(tile: Tile<number[]>, index: number) {
         this.tiles.splice(index, 1, tile);
     }
 
-    find(tile: Tile<number>): number {
+    find(tile: Tile<number[]>): number {
         let result = -1;
 
         for (let index = 0; index < this.tiles.length; index++) {
@@ -49,13 +49,13 @@ class Tileset {
         return result;
     }
 
-    get(index: number): Tile<number> {
+    get(index: number): Tile<number[]> {
         if (index >= this.tiles.length || index < 0) return null;
 
         return this.tiles[index];
     }
 
-    has(tile: Tile<number>): boolean {
+    has(tile: Tile<number[]>): boolean {
         return this.find(tile) != -1;
     }
 }
