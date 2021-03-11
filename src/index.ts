@@ -6,9 +6,15 @@ import astar from './lib/pathfinding/astar';
 import dijkstra from './lib/pathfinding/dijkstra';
 import gbfs from './lib/pathfinding/gbfs';
 import bfs from './lib/pathfinding/bfs';
+import Drawer from './lib/graphics/Drawer';
+
+import image from './assets/wall_test.png';
+import { mapfromimage, datafromsource } from './lib/graphics/images';
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
+
+const drawer = Drawer.drawer(ctx);
 
 const dirt = new Tile([10, 14]);
 const grass = new Tile([20, 28]);
@@ -19,132 +25,72 @@ set.insert(dirt);
 set.insert(grass);
 set.insert(bush);
 
-const map = new Tilemap(set, 15, 15);
+const map = new Tilemap(set, 16, 16);
 
-map.map = [
-     0,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-     0,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-     0,  0, -1, -1, -1, -1, -1,  0,  0, -1, -1, -1, -1, -1, -1,
-     0,  0, -1,  1,  1,  1,  1,  2,  2,  2,  2,  2, -1,  0,  0,
-     0,  0, -1,  1,  1,  1,  2,  2,  2,  2,  2,  1, -1,  0,  0,
-     0,  0, -1,  1,  1,  1,  2,  2,  2,  2,  1,  1, -1,  0,  0,
-     0,  0,  0,  1,  1,  1,  2,  2,  2,  2,  1,  1, -1,  0,  0,
-     0,  0,  0,  1,  1,  2,  2,  2,  2,  1,  1,  1,  0,  0,  0,
-     0,  0, -1,  1,  1,  2,  2,  2,  2,  1,  1,  1,  0,  0,  0,
-     0,  0, -1,  1,  2,  2,  2,  2,  1,  1,  1,  1, -1,  0,  0,
-     0,  0, -1,  2,  2,  2,  2,  2,  1,  1,  1,  1, -1,  0,  0,
-     0,  0, -1,  2,  2,  2,  2,  2,  1,  1,  1,  1, -1,  0,  0,
-    -1, -1, -1, -1,  0,  0, -1, -1, -1,  0,  0, -1, -1,  0,  0,
-     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  0,  0,
-     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  0,  0,
-];
+const mapImage = new Image(16, 16);
+mapImage.src = image;
 
-const graph = map.grid(true, true, true, [10, 14]);
+mapImage.onload = () => {
+    const [mapdata, palette] = mapfromimage(datafromsource(mapImage));
 
-const tile = 30;
-const size = 15;
+    map.map = mapdata;
 
-canvas.setAttribute("width",  `${tile * size}`);
-canvas.setAttribute("height", `${tile * size}`);
+    const graph = map.grid(false, true, true, [10, 14]);
 
-for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-        if (map.tile(x, y) == 2) {
-            ctx.strokeStyle = "crimson";
-        } else if (map.tile(x, y) == 1) {
-            ctx.strokeStyle = "green";
-        } else {
-            ctx.strokeStyle = "brown";
-        }
+    const tile = 30;
+    const size = 16;
 
-        if (map.tile(x, y) != -1) {
-            ctx.strokeRect(x * tile + 2, y * tile + 2, tile - 4, tile - 4);
-        }
-    }
-}
+    canvas.setAttribute("width", `${tile * size}`);
+    canvas.setAttribute("height", `${tile * size}`);
 
-const clean = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    function grid(x: number, y: number, color: string) {
+        ctx.fillStyle = color;
 
-const start = graph.node(0,0);
-
-function drawpath(path: Map<GraphNode, GraphNode>, current: GraphNode) {
-    const from = path.get(current);
-
-    ctx.fillStyle = "crimson";
-
-    if (from) {
-        if (from.x == current.x) {
-            if (from.y > current.y) {
-                ctx.fillText("↓", current.x * tile + 8, current.y * tile + 14);
-            } else {
-                ctx.fillText("↑", current.x * tile + 8, current.y * tile + 14);
-            }
-        } else {
-            if (from.x > current.x) {
-                ctx.fillText("→", current.x * tile + 8, current.y * tile + 14);
-            } else {
-                ctx.fillText("←", current.x * tile + 8, current.y * tile + 14);
-            }
-        }
-    } else if (current) {
-        ctx.fillText("O", current.x * tile + 8, current.y * tile + 14);
-    }
-}
-
-function manhattam(goal: GraphNode, next: GraphNode) {
-    return (Math.abs(goal.x - next.x) + Math.abs(goal.y - next.y)) * tile;
-}
-
-function euclidean(goal: GraphNode, next: GraphNode) {
-    const a = goal.x - next.x;
-    const b = goal.y - next.y;
-
-    return Math.round(Math.sqrt(a * a + b * b) * tile);
-}
-
-canvas.addEventListener("mousemove", e => {
-    ctx.putImageData(clean, 0, 0);
-
-    const goal = graph.node(Math.floor((e.offsetX-8)/tile), Math.floor((e.offsetY-8)/tile));
-
-    let patha = astar(start, goal, manhattam);
-    let pathb = dijkstra(start, goal);
-    let pathc = gbfs(start, goal, manhattam);
-    let pathd = bfs(start, goal);
-
-    let current = goal;
-
-    while(current) {
-        ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
-        ctx.fillRect(current.x * tile, current.y * tile, tile, tile);
-
-        current = patha.get(current);
+        ctx.fillRect(x * tile + 1, y * tile + 1, tile - 2, tile - 2);
     }
 
-    current = goal;
+    function small(x: number, y: number, color: string) {
+        ctx.fillStyle = color;
 
-    while(current) {
-        ctx.fillStyle = "rgba(0, 255, 0, 0.5)";
-        ctx.fillRect(current.x * tile, current.y * tile, tile, tile);
-
-        current = pathb.get(current);
+        ctx.fillRect(x * tile + 8, y * tile + 8, tile - 16, tile - 16);
     }
 
-    current = goal;
+    function stroke(x: number, y: number, color: string) {
+        ctx.strokeStyle = color;
 
-    while(current) {
-        ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
-        ctx.fillRect(current.x * tile, current.y * tile, tile, tile);
-
-        current = pathc.get(current);
+        ctx.strokeRect(x * tile + 2, y * tile + 2, tile - 4, tile - 4);
     }
 
-    current = goal;
+    drawer.tilemap(map, palette, small);
 
-    while(current) {
-        ctx.fillStyle = "rgba(128, 0, 255, 0.5)";
-        ctx.fillRect(current.x * tile, current.y * tile, tile, tile);
+    const clean = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-        current = pathd.get(current);
+    const start = graph.node(0, 0);
+
+    function manhattam(goal: GraphNode, next: GraphNode) {
+        return (Math.abs(goal.x - next.x) + Math.abs(goal.y - next.y)) * tile;
     }
-});
+
+    function euclidean(goal: GraphNode, next: GraphNode) {
+        const a = goal.x - next.x;
+        const b = goal.y - next.y;
+
+        return Math.round(Math.sqrt(a * a + b * b) * tile);
+    }
+
+    canvas.addEventListener("mousemove", e => {
+        ctx.putImageData(clean, 0, 0);
+
+        const goal = graph.node(Math.floor((e.offsetX - 8) / tile), Math.floor((e.offsetY - 8) / tile));
+
+        let patha = astar(start, goal, manhattam);
+        let pathb = dijkstra(start, goal);
+        let pathc = gbfs(start, goal, manhattam);
+        let pathd = bfs(start, goal);
+
+        drawer.path(patha, goal, "rgb(255,   0,   0)", tile);
+        // drawer.path(pathb, goal, "rgb(  0, 255,   0)", tile);
+        // drawer.path(pathc, goal, "rgb(  0,   0, 255)", tile);
+        // drawer.path(pathd, goal, "rgb(128,   0, 255)", tile);
+    });
+};

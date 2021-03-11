@@ -22,8 +22,8 @@ class Tilemap {
     }
 
     tile(x: number, y: number): number {
-        const cy = y > this.height ? this.height : y;
-        const cx = x >  this.width ? this.width  : x;
+        const cy = y > this.height ? this.height - 1 : y;
+        const cx = x >  this.width ? this.width - 1  : x;
 
         return this._tilemap[cy * this.width + cx];
     }
