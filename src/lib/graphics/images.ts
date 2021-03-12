@@ -1,3 +1,14 @@
+async function loadImage(source: string) {
+    return new Promise<HTMLImageElement>((resolve, reject) => {
+        const img = new Image();
+        
+        img.onload = e => resolve(e.target as HTMLImageElement);
+        img.onerror = reject;
+
+        img.src = source;
+    });
+}
+
 function datafromsource(image: HTMLImageElement) {
     const context = document.createElement("canvas").getContext("2d");
 
@@ -7,6 +18,17 @@ function datafromsource(image: HTMLImageElement) {
     context.drawImage(image, 0, 0);
 
     return context.getImageData(0, 0, image.width, image.height);
+}
+
+function datafromtile(image: HTMLImageElement, x: number, y: number, width: number, height: number) {
+    const context = document.createElement("canvas").getContext("2d");
+
+    context.canvas.width = image.width;
+    context.canvas.height = image.height;
+
+    context.drawImage(image, 0, 0);
+
+    return context.getImageData(x, y, width, height);
 }
 
 function mapfromimage(image: ImageData): [number[], string[]] {
@@ -32,4 +54,15 @@ function mapfromimage(image: ImageData): [number[], string[]] {
     return [result, palette];
 }
 
-export {datafromsource, mapfromimage};
+function canvasfromtile(image: HTMLImageElement, x: number, y: number, width: number, height: number) {
+    const canvas = document.createElement("canvas");
+
+    canvas.width  = width;
+    canvas.height = height;
+
+    canvas.getContext("2d").putImageData(datafromtile(image, x, y, width, height), 0, 0);
+
+    return canvas;
+}
+
+export {datafromsource, datafromtile, mapfromimage, loadImage, canvasfromtile};

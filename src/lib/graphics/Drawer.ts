@@ -1,4 +1,4 @@
-import Tilemap from "lib/DS/Tilemap";
+import Tilemap from "../DS/Tilemap";
 import { GraphNode } from "../DS/Graph";
 
 class Drawer {
@@ -52,11 +52,11 @@ class Drawer {
         });
     }
 
-    public tilemap(tilemap: Tilemap, styles: string[], drawfn: (x: number, y: number, style: string) => void) {
+    public tilemap(tilemap: Tilemap, styles: (string | CanvasGradient | CanvasPattern)[], drawfn: (x: number, y: number, style: string | CanvasGradient | CanvasPattern, isWall: boolean) => void) {
         for (let y = 0; y < tilemap.height; y++) {
             for (let x = 0; x < tilemap.width; x++) {
-                const index = tilemap.tile(x, y);
-                let style = "";
+                const index = tilemap.index(x, y);
+                let style: string | CanvasGradient | CanvasPattern;
 
                 if (index <= 0) {
                     style = styles[0];
@@ -64,9 +64,7 @@ class Drawer {
                     style = styles[index];
                 }
             
-                if (index != -1) {
-                    drawfn(x, y, style);
-                }
+                drawfn(x, y, style, index == -1);
             }
         }
     }
