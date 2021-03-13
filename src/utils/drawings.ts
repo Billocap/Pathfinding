@@ -1,7 +1,7 @@
 const draw = {
-    grid(context: CanvasRenderingContext2D, size: number) {
+    grid(context: CanvasRenderingContext2D, size: number, wall?: CanvasPattern) {
         return (x: number, y: number, color: string | CanvasGradient | CanvasPattern, isWall: boolean) => {
-            context.fillStyle = isWall ? "gray" : color;
+            context.fillStyle = isWall ? wall : color;
 
             context.fillRect(x * size, y * size, size, size);
         };
