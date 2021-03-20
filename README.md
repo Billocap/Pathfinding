@@ -6,17 +6,13 @@ This is a project for studying algorithms and a bit of game design.
 
 ## Running
 
-To run this project you need to have node or npm or yarn installed.
+To run this project you need to have node, npm or yarn installed.
 
-Just download the code or clone the repo in the desired folder then on the project folder run.
-```
->_ npm install
-```
-To install all the dependencies, after that run.
-```
->_ npm run build
-```
-To build the project, after building a _dist_ folder with a _js_ folder inside will appear in the project folder.
+Just download the code or clone the repo in the desired folder then on the **project folder** run `npm install` to install all the dependencies.
+
+A _node_modules_ folder should appear, after that run `npm run build` to build the project.
+
+After building a _dist_ folder with a _js_ folder inside will appear in the project folder.
 
 ![Example 1](./images/example-1.png)
 
