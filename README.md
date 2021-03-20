@@ -27,9 +27,7 @@ Then paste this code inside the **body tag**.
 <p>mouse x: 0 mouse y: 0</p>
 <script src="./js/index.js"></script>
 ```
-Now run the `html` file you created in the browser.
-
-_I recommend using the [live server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension._
+You will need a server to run the html code, I recommend using the [live server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) vscode extension.
 
 ## Built With
 - [TypeScript](https://www.typescriptlang.org/) - Main programming language.
