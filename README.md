@@ -14,11 +14,11 @@ A _node_modules_ folder should appear, after that run `npm run build` to build t
 
 After building a _dist_ folder with a _js_ folder inside will appear in the project folder.
 
-![Example 1](./images/example-1.png)
+![Example 1](./images/example-1.PNG)
 
 Now create a new `html` file inside the _dist_ folder.
 
-![Example 2](./images/example-2.png)
+![Example 2](./images/example-2.PNG)
 
 Then paste this code inside the **body tag**.
 
