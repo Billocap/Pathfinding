@@ -1,5 +1,3 @@
-import { Tileset } from "../DS/TileSet";
-
 async function loadImage(source: string) {
     return new Promise<HTMLImageElement>((resolve, reject) => {
         const img = new Image();

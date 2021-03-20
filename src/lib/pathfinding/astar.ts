@@ -1,13 +1,13 @@
-import { GraphNode } from '../DS/Graph';
 import HeapQueue from '../DS/HeapQueue';
 
-function astar(start: GraphNode, goal: GraphNode, h: (a: GraphNode, b: GraphNode) => number) {
-    const path = new Map<GraphNode, GraphNode>();
-    const frontier = new HeapQueue<GraphNode>();
-    const cost = new Map<GraphNode, number>();
+function astar(start: Graph.Node, goal: Graph.Node, h: (a: Graph.Node, b: Graph.Node) => number) {
+    const path = new Map<Graph.Node, Graph.Node>();
+    const frontier = new HeapQueue<Graph.Node>();
+    const cost = new Map<Graph.Node, number>();
 
     frontier.enqueue(start, 0);
     cost.set(start, 0);
+    path.set(start, null);
 
     while (frontier.length) {
         const current = frontier.dequeue();
@@ -28,7 +28,17 @@ function astar(start: GraphNode, goal: GraphNode, h: (a: GraphNode, b: GraphNode
         });
     }
 
-    return path;
+    let result = new Map<Graph.Node, Graph.Node>();
+
+    let current = goal;
+
+    while(current) {
+        result.set(path.get(current), current);
+
+        current = path.get(current);
+    }
+
+    return result;
 }
 
 export default astar;

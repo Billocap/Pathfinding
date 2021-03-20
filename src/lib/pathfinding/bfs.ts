@@ -1,8 +1,6 @@
-import { GraphNode } from "../DS/Graph";
-
-function bfs(start: GraphNode, goal: GraphNode) {
-    const frontier: GraphNode[] = [start];
-    const path = new Map<GraphNode, GraphNode>();
+function bfs(start: Graph.Node, goal: Graph.Node) {
+    const frontier: Graph.Node[] = [start];
+    const path = new Map<Graph.Node, Graph.Node>();
 
     path.set(start, null);
 
@@ -20,7 +18,17 @@ function bfs(start: GraphNode, goal: GraphNode) {
         });
     }
 
-    return path;
+    let result = new Map<Graph.Node, Graph.Node>();
+
+    let current = goal;
+
+    while(current) {
+        result.set(path.get(current), current);
+
+        current = path.get(current);
+    }
+
+    return result;
 }
 
 export default bfs;

@@ -6,9 +6,9 @@ const draw = {
             context.fillRect(x * size, y * size, size, size);
         };
     },
-    small(context: CanvasRenderingContext2D, size: number) {
+    small(context: CanvasRenderingContext2D, size: number, wall?: CanvasPattern) {
         return (x: number, y: number, color: string | CanvasGradient | CanvasPattern, isWall: boolean) => {
-            context.fillStyle = color;
+            context.fillStyle = isWall ? wall : color;
 
             context.fillRect(x * size + 8, y * size + 8, size - 16, size - 16);
         };

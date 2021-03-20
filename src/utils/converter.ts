@@ -1,8 +1,8 @@
-import Graph from "../lib/DS/Graph";
+import Grid from "../lib/DS/Graph";
 import Tilemap from "../lib/DS/Tilemap";
 
-function graphfromtilemap(tilemap: Tilemap, allowDiagonals: boolean, avoidCorners: boolean, avoidWalls: boolean, wallBias: [number, number]): Graph {
-    let result = new Graph();
+function graphfromtilemap(tilemap: Tilemap, allowDiagonals: boolean, avoidCorners: boolean, avoidWalls: boolean, wallBias: [number, number]): Grid {
+    let result = new Grid();
 
     for (let y = 0; y < tilemap.height; y++) {
         for (let x = 0; x < tilemap.width; x++) {

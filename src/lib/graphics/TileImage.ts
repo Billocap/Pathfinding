@@ -1,8 +1,13 @@
-class TileImage {
+class TileImage implements Mosaic.TileImage<HTMLCanvasElement> {
     private _source: HTMLImageElement;
     private _width: number;
     private _height: number;
 
+    /**
+     * Creates a new tileable image.
+     * @param width The width of a tile within the image.
+     * @param height The height of a tile within the image.
+     */
     constructor(width: number, height: number) {
         this._width = width;
         this._height = height;
@@ -12,7 +17,7 @@ class TileImage {
         this._source = image;
     }
 
-    tile(x: number, y: number, width: number, height: number) {
+    tile(x: number, y: number, width: number, height: number): HTMLCanvasElement {
         const context = document.createElement("canvas").getContext("2d");
 
         context.canvas.width  = width;

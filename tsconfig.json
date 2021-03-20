@@ -5,7 +5,11 @@
         "baseUrl": "./src",
         "sourceMap": false,
         "declaration": false,
-        "target": "ES5"
+        "target": "ES5",
+        "typeRoots": [
+            "./node_modules/@types",
+            "./src/@types/*"
+        ]
     },
     
     "include": [

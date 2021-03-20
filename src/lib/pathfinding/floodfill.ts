@@ -1,8 +1,6 @@
-import { GraphNode } from "../DS/Graph";
-
-function floodfill(start: GraphNode) {
-    const frontier: GraphNode[] = [start];
-    const path = new Map<GraphNode, GraphNode>();
+function floodfill(start: Graph.Node) {
+    const frontier: Graph.Node[] = [start];
+    const path = new Map<Graph.Node, Graph.Node>();
 
     path.set(start, null);
 

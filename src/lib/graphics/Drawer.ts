@@ -1,5 +1,5 @@
 import Tilemap from "../DS/Tilemap";
-import { GraphNode } from "../DS/Graph";
+import { GridNode } from "../DS/Graph";
 
 class Drawer {
     private static instance: Drawer;
@@ -15,10 +15,10 @@ class Drawer {
         return this.instance;
     }
 
-    public path(path: Map<GraphNode, GraphNode>, goal: GraphNode, color: string, size: number) {
-        let current = goal;
+    public path(path: Map<Graph.Node, Graph.Node>, start: Graph.Node, color: string | CanvasGradient | CanvasPattern, size: number) {
+        let current = start;
 
-        while(current) {
+        while(current && current instanceof GridNode) {
             this.context.fillStyle = color;
             this.context.fillRect(current.x * size, current.y * size, size, size);
 
@@ -26,7 +26,7 @@ class Drawer {
         }
     }
 
-    public frontier(path: Map<GraphNode, GraphNode>, color: string, size: number) {
+    public frontier(path: Map<GridNode, GridNode>, color: string | CanvasGradient | CanvasPattern, size: number) {
         path.forEach(current => {
             const from = path.get(current);
     

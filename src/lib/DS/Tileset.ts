@@ -1,4 +1,5 @@
-class Tile<Type> {
+// Works as container for data.
+class Tile<Type> implements Mosaic.Tile<Type> {
     private _data: Type;
 
     constructor(data: Type) {
@@ -14,14 +15,16 @@ class Tile<Type> {
     }
 }
 
-class Tileset<Type> {
-    private tiles: Tile<Type>[];
+// Tileset works as list of tiles.
+// Can be replace by a simple array.
+class Tileset<Type> implements Mosaic.Tileset<Type> {
+    private tiles: Mosaic.Tile<Type>[];
 
     constructor() {
         this.tiles = [];
     }
 
-    insert(tile: Tile<Type>, index: number = this.tiles.length) {
+    insert(tile: Mosaic.Tile<Type>, index: number = this.tiles.length) {
         this.tiles.splice(index, 0, tile);
     }
 
@@ -29,11 +32,11 @@ class Tileset<Type> {
         this.tiles.splice(index, 1);
     }
 
-    replace(tile: Tile<Type>, index: number) {
+    replace(tile: Mosaic.Tile<Type>, index: number) {
         this.tiles.splice(index, 1, tile);
     }
 
-    find(tile: Tile<Type>): number {
+    find(tile: Mosaic.Tile<Type>): number {
         let result = -1;
 
         for (let index = 0; index < this.tiles.length; index++) {
@@ -49,14 +52,38 @@ class Tileset<Type> {
         return result;
     }
 
-    get(index: number): Tile<Type> {
+    tile(index: number): Mosaic.Tile<Type> {
         if (index >= this.tiles.length || index < 0) return null;
 
         return this.tiles[index];
     }
 
-    has(tile: Tile<Type>): boolean {
+    data(index: number): Type {
+        if (index >= this.tiles.length || index < 0) return null;
+
+        return this.tiles[index].data;
+    }
+
+    has(tile: Mosaic.Tile<Type>): boolean {
         return this.find(tile) != -1;
+    }
+
+    from(array: Type[]) {
+        this.tiles = new Array<Mosaic.Tile<Type>>();
+
+        array.forEach(data => {
+            this.tiles.push(new Tile<Type>(data));
+        });
+    }
+
+    list(): Type[] {
+        let result = [];
+
+        this.tiles.forEach(tile => {
+            result.push(tile.data);
+        });
+
+        return result;
     }
 }
 

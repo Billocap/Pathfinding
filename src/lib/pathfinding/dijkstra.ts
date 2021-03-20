@@ -1,10 +1,9 @@
-import { GraphNode } from "../DS/Graph";
 import HeapQueue from "../DS/HeapQueue";
 
-function dijkstra(start: GraphNode, goal: GraphNode) {
-    const frontier = new HeapQueue<GraphNode>();
-    const path = new Map<GraphNode, GraphNode>();
-    const cost = new Map<GraphNode, number>();
+function dijkstra(start: Graph.Node, goal: Graph.Node) {
+    const frontier = new HeapQueue<Graph.Node>();
+    const path = new Map<Graph.Node, Graph.Node>();
+    const cost = new Map<Graph.Node, number>();
 
     frontier.enqueue(start, 0);
     path.set(start, null);
@@ -13,7 +12,7 @@ function dijkstra(start: GraphNode, goal: GraphNode) {
     while(frontier.length) {
         const current = frontier.dequeue();
 
-        //if (current == goal) break;
+        if (current == goal) break;
 
         current.neighbors.forEach(([next, weight]) => {
             if (next != null) {
@@ -29,7 +28,17 @@ function dijkstra(start: GraphNode, goal: GraphNode) {
         });
     }
 
-    return path;
+    let result = new Map<Graph.Node, Graph.Node>();
+
+    let current = goal;
+
+    while(current) {
+        result.set(path.get(current), current);
+
+        current = path.get(current);
+    }
+
+    return result;
 }
 
 export default dijkstra;
