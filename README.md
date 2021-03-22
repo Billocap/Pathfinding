@@ -1,4 +1,5 @@
-![Banner](./images/banner.png)
+<p align="center"><img src="./images/banner.png"/></p>
+
 # Path Finding
 ![Typescript badge](https://shields.io/badge/TypeScript-white?logo=typescript&logoColor=black&labelColor=007acc) ![HTML badge](https://shields.io/badge/HTML-white?logo=html5&logoColor=white&labelColor=f06529)
 
