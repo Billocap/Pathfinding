@@ -1,6 +1,6 @@
-function floodfill(start: Graph.Node) {
-    const frontier: Graph.Node[] = [start];
-    const path = new Map<Graph.Node, Graph.Node>();
+function floodfill(start: Network.Node) {
+    const frontier: Network.Node[] = [start];
+    const path = new Map<Network.Node, Network.Node>();
 
     path.set(start, null);
 

@@ -8,6 +8,7 @@ import Drawer from './lib/graphics/Drawer';
 import { loadImage } from './lib/graphics/images';
 import TilemapImage from './lib/graphics/TilemapImage';
 import TileImage from './lib/graphics/TileImage';
+import Layer from './lib/graphics/Layer';
 
 import PathWalker from './lib/Agents/PathWalker';
 
@@ -23,7 +24,7 @@ const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 const coord = document.querySelector("p");
 
-const drawer = Drawer.drawer(ctx);
+let drawer = Drawer.drawer(ctx);
 
 const dirt = new Tile([10, 14]);
 const grass = new Tile([12, 14]);
@@ -39,7 +40,22 @@ set.insert(water);
 const tilemapImage = new TilemapImage();
 const imageTileset = new TileImage(8, 8);
 
+const background = new Layer();
+const pathDraw = new Layer();
+const mouseCursor = new Layer();
+const player = new Layer();
+
+background.link(pathDraw);
+pathDraw.link(mouseCursor);
+mouseCursor.link(player);
+
 const tile = 16;
+
+const MOUSE = {
+    x: 0,
+    y: 0,
+    button: false
+};
 
 loadImage(tiles).then(response => {
     imageTileset.source = response;
@@ -73,15 +89,13 @@ loadImage(tiles).then(response => {
     canvas.setAttribute("width",  `${tile * mapImage.width }`);
     canvas.setAttribute("height", `${tile * mapImage.height}`);
 
-    drawer.tilemap(
-        map,
-        imageSet.list().map(item => ctx.createPattern(item, "repeat")),
-        draw.grid(ctx, tile, ctx.createPattern(imageTileset.tile(0, 0, tile, tile), "repeat"))
-    );
-
-    const clean = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-    let pathclean = clean;
+    background.drawSteps( ctx => {
+        drawer.tilemap(
+            map,
+            imageSet.list().map(item => ctx.createPattern(item, "repeat")),
+            draw.grid(ctx, tile, ctx.createPattern(imageTileset.tile(0, 0, tile, tile), "repeat"))
+        )
+    });
 
     let start = graph.node(0, 0);
 
@@ -94,46 +108,65 @@ loadImage(tiles).then(response => {
     walk.path = path as Map<GridNode, GridNode>;
 
     canvas.addEventListener("mousemove", e => {
-        ctx.putImageData(clean, 0, 0);
-
-        const start = graph.node(walk.current.x, walk.current.y);
-
-        const goal = graph.node(Math.floor((e.offsetX - 8) / tile), Math.floor((e.offsetY - 8) / tile));
-
-        let apath = astar(start, goal, heuristics.euclidean(tile));
-
-        drawer.path(apath, start, ctx.createPattern(imageTileset.tile(2, 4, 16, 16), "repeat"), tile);
-
-        pathclean = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-        ctx.drawImage(imageTileset.tile(4, 0, tile, tile), walk.current.x * tile, walk.current.y * tile);
-
-        coord.innerHTML = `mouse x: ${goal.x} - mouse y: ${goal.y}`;
+        MOUSE.x = e.offsetX;
+        MOUSE.y = e.offsetY;
     });
 
     canvas.addEventListener("click", e => {
-        ctx.putImageData(clean, 0, 0);
-
-        const goal = graph.node(Math.floor((e.offsetX - 8) / tile), Math.floor((e.offsetY - 8) / tile));
-
-        const start = graph.node(walk.current.x, walk.current.y);
-
-        walk.current = start;
-
-        let path = astar(start, goal, heuristics.euclidean(tile));
-
-        walk.path = path as Map<GridNode, GridNode>;
-
-        drawer.path(path, start, ctx.createPattern(imageTileset.tile(2, 4, 16, 16), "repeat"), tile);
-
-        pathclean = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        MOUSE.button = true;
     });
 
-    setInterval(() => {
-        ctx.putImageData(pathclean, 0, 0);
+    let DTIME = 0;
 
-        let current = walk.walk();
+    function mainLoop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        ctx.drawImage(imageTileset.tile(4, 0, tile, tile), current.x * tile, current.y * tile);
-    }, 100);
+        const goal = graph.node(Math.floor((MOUSE.x - 4) / tile), Math.floor((MOUSE.y - 4) / tile));
+
+        if (goal) coord.innerHTML = `mouse x: ${goal.x} - mouse y: ${goal.y}`;
+
+        mouseCursor.drawSteps(ctx => {
+            if (goal) ctx.drawImage(imageTileset.tile(11, 1, 16, 16), goal.x * tile, goal.y * tile);
+        });
+
+        if (MOUSE.button) {
+            const start = graph.node(walk.current.x, walk.current.y);
+
+            walk.current = start;
+
+            let path = astar(start, goal, heuristics.euclidean(tile));
+
+            walk.path = path as Map<GridNode, GridNode>;
+
+            pathDraw.drawSteps(ctx => {
+                drawer.path(path, start, goal, ctx.createPattern(imageTileset.tile(2, 4, tile, tile), "repeat"), tile);
+
+                ctx.fillStyle = ctx.createPattern(imageTileset.tile(3, 3, tile, tile), "repeat");
+
+                ctx.fillRect(start.x * tile, start.y * tile, tile, tile);
+
+                ctx.fillStyle = ctx.createPattern(imageTileset.tile(3, 4, tile, tile), "repeat");
+
+                ctx.fillRect(goal.x * tile, goal.y * tile, tile, tile);
+            });
+        }
+
+        if (DTIME % 5 == 0) {
+            let current = walk.walk();
+
+            player.drawSteps(ctx => {
+                ctx.drawImage(imageTileset.tile(4, 0, tile, tile), current.x * tile, current.y * tile);
+            });
+        }
+
+        background.draw(ctx);
+
+        DTIME += 1;
+
+        MOUSE.button = false;
+
+        requestAnimationFrame(mainLoop);
+    }
+
+    requestAnimationFrame(mainLoop);
 });

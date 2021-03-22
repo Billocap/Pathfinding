@@ -1,7 +1,7 @@
 /**
  * Declares the basic interfaces a Graph must have.
  */
-declare namespace Graph {
+declare namespace Network {
     /**
      * Represents a vertex on the graph, must store it's edges and the weight of this edges.
      */
@@ -9,20 +9,20 @@ declare namespace Graph {
         /**
          * An array containing the nodes an weights of the connections.
          */
-        neighbors: [Graph.Node, number][];
+        neighbors: [Network.Node, number][];
         /**
          * Returns the node and weight of that link.
          * @param args Any extra paramethers needed for the implementation.
          * @returns An array with the node and weight.
          */
-        neighbor(...args: any[]): [Graph.Node, number];
+        neighbor(...args: any[]): [Network.Node, number];
         /**
          * Unidirectionally links this node to the other node.
          * @param node Node to connect to.
          * @param weight The weight of the link.
          * @param args Any extra paramethers needed for the implementation.
          */
-        link(node: Graph.Node, weight: number, ...args: any[]): void;
+        link(node: Network.Node, weight: number, ...args: any[]): void;
     }
 
     /**
@@ -44,13 +44,13 @@ declare namespace Graph {
          * @param args Any paremthers needed.
          * @returns The quered node.
          */
-        node(...args: any[]): Graph.Node;
+        node(...args: any[]): Network.Node;
         /**
          * Link to nodes on the graph.
          * @param nodefrom The first node to link.
          * @param nodeto The second node to link.
          * @param weight The weight of the link.
          */
-        link(nodefrom: Graph.Node, nodeto: Graph.Node, weight: number): void;
+        link(nodefrom: Network.Node, nodeto: Network.Node, weight: number): void;
     }
 }

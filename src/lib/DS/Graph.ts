@@ -2,7 +2,7 @@ type direction = "right" | "left" | "top" | "bottom" | "bright" | "bleft" | "tle
 type weight = number; // Just some verbose.
 
 // Grid centric node implementation.
-class GridNode implements Graph.Node {
+class GridNode implements Network.Node {
     public x: number;
     public y: number;
     
@@ -58,9 +58,10 @@ class GridNode implements Graph.Node {
     }
 }
 
-class Grid implements Graph.Graph{
-    // Saves the connections in a map because it's kind painfull
-    // to deal with 2d arrays in JavaScript;
+class Grid implements Network.Graph{
+    // Saves the connections in a map because 
+    // despite beeing a grid the graph don't need
+    // to have a specific shape.
     private nodes: Map<string, GridNode>;
 
     constructor() {

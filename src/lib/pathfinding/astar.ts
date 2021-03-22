@@ -1,9 +1,9 @@
 import HeapQueue from '../DS/HeapQueue';
 
-function astar(start: Graph.Node, goal: Graph.Node, h: (a: Graph.Node, b: Graph.Node) => number) {
-    const path = new Map<Graph.Node, Graph.Node>();
-    const frontier = new HeapQueue<Graph.Node>();
-    const cost = new Map<Graph.Node, number>();
+function astar(start: Network.Node, goal: Network.Node, h: (a: Network.Node, b: Network.Node) => number) {
+    const path = new Map<Network.Node, Network.Node>();
+    const frontier = new HeapQueue<Network.Node>();
+    const cost = new Map<Network.Node, number>();
 
     frontier.enqueue(start, 0);
     cost.set(start, 0);
@@ -28,7 +28,7 @@ function astar(start: Graph.Node, goal: Graph.Node, h: (a: Graph.Node, b: Graph.
         });
     }
 
-    let result = new Map<Graph.Node, Graph.Node>();
+    let result = new Map<Network.Node, Network.Node>();
 
     let current = goal;
 

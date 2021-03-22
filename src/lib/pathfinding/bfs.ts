@@ -1,6 +1,6 @@
-function bfs(start: Graph.Node, goal: Graph.Node) {
-    const frontier: Graph.Node[] = [start];
-    const path = new Map<Graph.Node, Graph.Node>();
+function bfs(start: Network.Node, goal: Network.Node) {
+    const frontier: Network.Node[] = [start];
+    const path = new Map<Network.Node, Network.Node>();
 
     path.set(start, null);
 
@@ -18,7 +18,7 @@ function bfs(start: Graph.Node, goal: Graph.Node) {
         });
     }
 
-    let result = new Map<Graph.Node, Graph.Node>();
+    let result = new Map<Network.Node, Network.Node>();
 
     let current = goal;
 

@@ -2,7 +2,7 @@
 # Path Finding
 ![Typescript badge](https://shields.io/badge/TypeScript-white?logo=typescript&logoColor=black&labelColor=007acc) ![HTML badge](https://shields.io/badge/HTML-white?logo=html5&logoColor=white&labelColor=f06529)
 
-This is a project for studying algorithms and a bit of game design.
+This is a project for studying algorithms and  game design.
 
 ## Running
 

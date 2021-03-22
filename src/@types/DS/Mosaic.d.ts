@@ -131,4 +131,6 @@ declare namespace Mosaic {
          */
         tile(x: number, y: number, width: number, height: number): Type;
     }
+
+    interface TilemapImage {}
 }

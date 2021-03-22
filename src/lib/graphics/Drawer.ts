@@ -15,12 +15,15 @@ class Drawer {
         return this.instance;
     }
 
-    public path(path: Map<Graph.Node, Graph.Node>, start: Graph.Node, color: string | CanvasGradient | CanvasPattern, size: number) {
+    public path(path: Map<Network.Node, Network.Node>, start: Network.Node, goal: Network.Node, color: string | CanvasGradient | CanvasPattern, size: number) {
         let current = start;
 
         while(current && current instanceof GridNode) {
             this.context.fillStyle = color;
-            this.context.fillRect(current.x * size, current.y * size, size, size);
+
+            if (current != start && current != goal) {
+                this.context.fillRect(current.x * size, current.y * size, size, size);
+            }
 
             current = path.get(current);
         }

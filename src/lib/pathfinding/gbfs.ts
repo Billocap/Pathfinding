@@ -1,8 +1,8 @@
 import HeapQueue from "../DS/HeapQueue";
 
-function gbfs(start: Graph.Node, goal: Graph.Node, h: (a: Graph.Node, b: Graph.Node) => number) {
-    const frontier = new HeapQueue<Graph.Node>();
-    const path = new Map<Graph.Node, Graph.Node>();
+function gbfs(start: Network.Node, goal: Network.Node, h: (a: Network.Node, b: Network.Node) => number) {
+    const frontier = new HeapQueue<Network.Node>();
+    const path = new Map<Network.Node, Network.Node>();
 
     frontier.enqueue(start, 0);
     path.set(start, null);
@@ -23,7 +23,7 @@ function gbfs(start: Graph.Node, goal: Graph.Node, h: (a: Graph.Node, b: Graph.N
         });
     }
 
-    let result = new Map<Graph.Node, Graph.Node>();
+    let result = new Map<Network.Node, Network.Node>();
 
     let current = goal;
 
